@@ -10,7 +10,7 @@
     volScalarField& p = thermo.p();
     volScalarField& e = thermo.e();
 
-    volScalarField psis("psi", thermo.psi()/thermo.Cp()*thermo.Cv());
+    volScalarField psis("psis", thermo.psi()/thermo.Cp()*thermo.Cv());
     psis.oldTime();
 
     volScalarField rho
