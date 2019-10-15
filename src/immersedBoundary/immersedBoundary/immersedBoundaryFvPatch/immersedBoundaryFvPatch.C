@@ -60,10 +60,29 @@ void Foam::immersedBoundaryFvPatch::makeCf(slicedSurfaceVectorField& Cf) const
     // Insert the patch data for the immersed boundary
     // Note: use the face centres from the stand-alone patch within the IB
     // HJ, 30/Nov/2017
-    Cf.boundaryField()[index()].UList::operator=
-    (
-        vectorField::subField(ibPolyPatch_.ibPatch().faceCentres(), size())
-    );
+
+    // NOTE: Loop though all ib boundaries in order to update the fields
+    // overwritten by reset. Needed for multiple IB patches (IG 2/Nov/2018)
+    const fvMesh& mesh = boundaryMesh().mesh();
+    forAll(mesh.boundary(), patchI)
+    {
+        if(isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+        {
+            const immersedBoundaryFvPatch& curIbPatch = refCast
+            <
+                const immersedBoundaryFvPatch
+            >(mesh.boundary()[patchI]);
+
+            Cf.boundaryField()[patchI].UList::operator=
+                (
+                    vectorField::subField
+                    (
+                        curIbPatch.ibPolyPatch().ibPatch().faceCentres(),
+                        curIbPatch.size()
+                    )
+                );
+        }
+    }
 }
 
 
@@ -76,10 +95,29 @@ void Foam::immersedBoundaryFvPatch::makeSf(slicedSurfaceVectorField& Sf) const
     // Note: use the corrected face areas from immersed boundary instead of
     // the stand-alone patch areas within the IB
     // HJ, 30/Nov/2017
-    Sf.boundaryField()[index()].UList::operator=
-    (
-        vectorField::subField(ibPolyPatch_.correctedIbPatchFaceAreas(), size())
-    );
+
+    // NOTE: Loop though all ib boundaries in order to update the fields
+    // overwritten by reset. Needed for multiple IB patches (IG 2/Nov/2018)
+    const fvMesh& mesh = boundaryMesh().mesh();
+    forAll(mesh.boundary(), patchI)
+    {
+        if(isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+        {
+            const immersedBoundaryFvPatch& curIbPatch = refCast
+            <
+                const immersedBoundaryFvPatch
+            >(mesh.boundary()[patchI]);
+
+            Sf.boundaryField()[patchI].UList::operator=
+                (
+                    vectorField::subField
+                    (
+                        curIbPatch.ibPolyPatch().correctedIbPatchFaceAreas(),
+                        curIbPatch.size()
+                    )
+                );
+        }
+    }
 }
 
 
@@ -95,10 +133,29 @@ void Foam::immersedBoundaryFvPatch::makeC(slicedVolVectorField& C) const
     // Insert the patch data for the immersed boundary
     // Note: use the face centres from the stand-alone patch within the IB
     // HJ, 30/Nov/2017
-    C.boundaryField()[index()].UList::operator=
-    (
-        vectorField::subField(ibPolyPatch_.ibPatch().faceCentres(), size())
-    );
+
+    // NOTE: Loop though all ib boundaries in order to update the fields
+    // overwritten by reset. Needed for multiple IB patches (IG 2/Nov/2018)
+    const fvMesh& mesh = boundaryMesh().mesh();
+    forAll(mesh.boundary(), patchI)
+    {
+        if(isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+        {
+            const immersedBoundaryFvPatch& curIbPatch = refCast
+            <
+                const immersedBoundaryFvPatch
+            >(mesh.boundary()[patchI]);
+
+            C.boundaryField()[patchI].UList::operator=
+                (
+                    vectorField::subField
+                    (
+                        curIbPatch.ibPolyPatch().ibPatch().faceCentres(),
+                        curIbPatch.size()
+                    )
+                );
+        }
+    }
 }
 
 
@@ -270,33 +327,7 @@ void Foam::immersedBoundaryFvPatch::makeDeltaCoeffs
 void Foam::immersedBoundaryFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     // Set patch non-orthogonality correction to zero
-//    cv = vector::zero;
-
-    vectorField& cvIn = const_cast<vectorField&>(cv.internalField());
-
-    const fvMesh& mesh = boundaryMesh().mesh();
-
-    // Get face addressing
-    const unallocLabelList& owner = mesh.owner();
-    const unallocLabelList& neighbour = mesh.neighbour();
-
-    // Calculate volume fraction for all cells
-    const scalarField gamma = mesh.V().field()/mesh.cellVolumes();
-
-    // Visit all internal faces.  If a corrected volume fraction is smaller
-    // than a threshold, reset non-orthogonality for the face
-    forAll (neighbour, faceI)
-    {
-        if
-        (
-            gamma[owner[faceI]] < nonOrthogonalFactor_()
-         || gamma[neighbour[faceI]] < nonOrthogonalFactor_()
-        )
-        {
-            // Thin live cut.  Reset correction vectors
-            cvIn[faceI] = vector::zero;
-        }
-    }
+    cv = vector::zero;
 }
 
 
