@@ -184,7 +184,7 @@ rpm_build()
     #rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB --clean -bb ./SPECS/$specFile "$@"
     #
     # Let's keep the compilation directory alive for now in order to facilitate postmortems of failed compilations
-    rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB -bb ./SPECS/$specFile "$@"
+    rpmbuild --define "_build_id_links none" --define "_topdir $buildBase" --dbpath $buildBase/rpmDB -bb ./SPECS/$specFile "$@"
 }
 
 #
