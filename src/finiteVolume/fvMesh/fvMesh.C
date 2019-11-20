@@ -61,6 +61,10 @@ void Foam::fvMesh::clearGeomNotOldVol()
     deleteDemandDrivenData(magSfPtr_);
     deleteDemandDrivenData(CPtr_);
     deleteDemandDrivenData(CfPtr_);
+
+    // Mesh moved: force recalculation of surface interpolation data.
+    // HJ, 20/Nov/2019
+    surfaceInterpolation::clearOut();
 }
 
 
@@ -107,7 +111,6 @@ void Foam::fvMesh::clearAddressing()
 void Foam::fvMesh::clearOut()
 {
     clearGeom();
-    surfaceInterpolation::clearOut();
 
     clearAddressing();
 

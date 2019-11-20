@@ -43,6 +43,8 @@ void Foam::surfaceInterpolation::clearOut()
 {
     deleteDemandDrivenData(weightingFactors_);
     deleteDemandDrivenData(deltaCoeffs_);
+
+    orthogonal_ = false;
     deleteDemandDrivenData(correctionVectors_);
 }
 
@@ -120,11 +122,7 @@ Foam::surfaceInterpolation::correctionVectors() const
 
 bool Foam::surfaceInterpolation::movePoints()
 {
-    deleteDemandDrivenData(weightingFactors_);
-    deleteDemandDrivenData(deltaCoeffs_);
-
-    orthogonal_ = false;
-    deleteDemandDrivenData(correctionVectors_);
+    clearOut();
 
     return true;
 }
