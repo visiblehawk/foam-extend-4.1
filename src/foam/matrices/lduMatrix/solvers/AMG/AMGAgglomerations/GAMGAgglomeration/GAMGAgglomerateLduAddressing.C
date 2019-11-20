@@ -227,6 +227,11 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
         }
     }
 
+    if (Pstream::parRun())
+    {
+        Pstream::waitRequests();
+    }
+
     // Store coefficients to avoid tangled communications
     // HJ, 1/Apr/2009
     FieldField<Field, label> fineInterfaceAddr(fineInterfaces.size());
@@ -251,11 +256,6 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
                 );
             }
         }
-    }
-
-    if (Pstream::parRun())
-    {
-        Pstream::waitRequests();
     }
 
     // Add the coarse level
